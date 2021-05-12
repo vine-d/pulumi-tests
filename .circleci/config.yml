@@ -14,4 +14,5 @@ jobs:
             npm install
             npm run build
       - pulumi/update:
-          stack: website-prod
+          working_directory: ~/repo/pulumiProject
+          stack: hml
