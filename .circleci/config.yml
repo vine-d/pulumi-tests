@@ -13,6 +13,7 @@ jobs:
           working_directory: ~/repo/pulumiProject
           command: |
             npm install
+            npm install --save @pulumi/aws mime
       - pulumi/update:
           working_directory: ~/repo/pulumiProject
           stack: hml
