@@ -15,13 +15,10 @@ jobs:
             npm install
             npm install @types/mime
       - run:
-            name: Configure AWS Access Key ID
-            command: |
-              aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID} --profile default
-      - run:
-          name: Configure AWS Secret Access Key
+          name: Set AWS keys
           command: |
-            aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY} --profile default
+            export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+            export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - pulumi/update:
           working_directory: ~/repo/pulumiProject
           stack: hml
