@@ -4,14 +4,14 @@ orbs:
 jobs:
   build:
     docker:
-      - image: circleci/node:10
+      - image: circleci/node:11
     working_directory: ~/repo
     steps:
       - checkout
       - pulumi/login
       - run:
           working_directory: ~/repo/pulumiProject
-          command:
+          command: |
             npm install
       - pulumi/update:
           working_directory: ~/repo/pulumiProject
