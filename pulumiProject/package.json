@@ -1,7 +1,8 @@
 {
     "name": "vineStaticWebSite",
     "devDependencies": {
-        "@types/node": "^10.0.0"
+        "@types/node": "^10.0.0",
+				"@types/mime": "^2.0.3"
     },
     "dependencies": {
         "@pulumi/aws": "^4.3.0",
