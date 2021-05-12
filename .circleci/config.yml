@@ -5,7 +5,7 @@ jobs:
   build:
     docker:
       - image: circleci/node:7.10
-    working_directory: ~/repo
+    working_directory: ~/repo/pulumiProject
     steps:
       - checkout
       - pulumi/login
@@ -14,5 +14,4 @@ jobs:
             npm install
             npm run build
       - pulumi/update:
-          working_directory: ~/repo/pulumiProject
           stack: hml
