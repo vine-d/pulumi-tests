@@ -14,5 +14,4 @@ jobs:
           command: |
             npm install
       - pulumi/update:
-          stack: hml
-          skip-preview: true
+          stack: hml --yes
