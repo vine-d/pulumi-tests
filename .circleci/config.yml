@@ -74,12 +74,12 @@ workflows:
     jobs:
       - deploy_dev
       - deploy_hml:
-        requires:
+          requires:
           - deploy_dev
       - hold:
-        type: approval
-        requires:
-          - deploy_hml
+          type: approval
+          requires:
+            - deploy_hml
       - deploy_prd:
-        requires:
-          - hold
+          requires:
+            - hold
