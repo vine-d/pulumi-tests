@@ -2,6 +2,49 @@ version: 2.1
 orbs:
   pulumi: pulumi/pulumi@2.0.0
 jobs:
+
+  increment_patch:
+    docker:
+      - image: circleci/node
+    steps:
+      - checkout
+      - run:
+          command: |
+            git fetch --tags
+            echo " [Incrementing patch tag] "
+            GITLATESTTAG=$(git tag --list "<<parameters.tag_pattern>>" | tail -1)
+            printf " Latest matching tag: $(git tag --list "<<parameters.tag_pattern>>" | tail -1)"
+            if [[ $GITLATESTTAG =~ ^(.*)(([0-9]+)\.([0-9]+)\.([0-9]+))(-.*)? ]]; then # If the tag has a valid SEMVER then proceed with upgrade
+              echo "    Prefix: ${BASH_REMATCH[1]}"
+              SEMPREFIX=${BASH_REMATCH[1]}
+              echo "    Major: ${BASH_REMATCH[3]}"
+              SEMVERMAJOR=${BASH_REMATCH[3]}
+              echo "    Minor: ${BASH_REMATCH[4]}"
+              SEMVERMINOR=${BASH_REMATCH[4]}
+              echo "    Patch: ${BASH_REMATCH[5]}"
+              SEMVERPATCH=${BASH_REMATCH[5]}
+              echo "    Suffix: ${BASH_REMATCH[6]} "
+              SEMVERSUFFIX=${BASH_REMATCH[6]}
+
+              # Increment the Patch
+              SEMVERPATCH=$(expr ${SEMVERPATCH} + 1)
+              echo "Incrementing patch ${SEMVERPATCH}"
+
+              # Once the tag has been destructured and manipulated, put back together here
+              GITNEWTAG="${SEMPREFIX}${SEMVERMAJOR}.${SEMVERMINOR}.${SEMVERPATCH}${SEMVERSUFFIX}"
+
+            else # If no SEMVER found, fail.
+              echo "Unable to find semver"
+              exit 1
+            fi
+
+            # Complete tag creation. Newly created tag will now exist in $GITNEWTAG
+            printf " Newly created tag: ${GITNEWTAG} "
+            printf "Pushing '${GITNEWTAG}' to origin for commit ${CIRCLE_SHA1} "
+            git tag ${GITNEWTAG} ${CIRCLE_SHA1}
+            git push origin ${GITNEWTAG}
+    name: Create and publish tagged commit
+
   deploy_dev:
     docker:
       - image: circleci/node:11
@@ -72,14 +115,30 @@ workflows:
   version: 2
   deploy_stacks:
     jobs:
-      - deploy_dev
-      - deploy_hml:
+      - deploy_dev:
+          filters:
+            branches:
+              only: development
+      - increment_patch:
           requires:
-          - deploy_dev
+            - deploy_dev
+          filters:
+            branches:
+              only: development
+      - deploy_hml:
+          filters:
+            branches:
+              only: master
       - hold:
           type: approval
           requires:
             - deploy_hml
+          filters:
+            branches:
+              only: master
       - deploy_prd:
           requires:
             - hold
+          filters:
+            branches:
+              only: master
