@@ -43,7 +43,6 @@ jobs:
             printf "Pushing '${GITNEWTAG}' to origin for commit ${CIRCLE_SHA1} "
             git tag ${GITNEWTAG} ${CIRCLE_SHA1}
             git push origin ${GITNEWTAG}
-    name: Create and publish tagged commit
 
   deploy_dev:
     docker:
